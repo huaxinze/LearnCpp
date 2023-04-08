@@ -5,7 +5,7 @@ using namespace std;
 
 class thread_guard {
 private:
-    std::thread& t;
+    std::thread& t; // 用引用的原因是，thread复制函数会引发析构
 
 public:
     explicit thread_guard(std::thread& t_)
