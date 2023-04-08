@@ -30,6 +30,19 @@ void update(int a, std::string& b)
     cout << a << " " << b << endl;
 }
 
+void process(std::unique_ptr<int> p)
+{
+    cout << "enter move " << *p << endl;
+}
+
+class X {
+public:
+    void doWork(const string& str)
+    {
+        cout << "enter do work " << str << endl;
+    }
+};
+
 int main()
 {
     int num = 12;
@@ -76,6 +89,18 @@ int main()
     string str = "jiamo ai ";
     std::thread thr6(update, 3, std::ref(str));
     thr6.join();
+    /*
+     * 9.使用类的成员函数，需要传入this指针
+     */
+    X my_x;
+    std::thread thr7(&X::doWork, &my_x, "huaxinze");
+    thr7.join();
+    /*
+     * 10.移动语义，需要加入std::move
+     */
+    std::unique_ptr<int> p(new int(10));
+    std::thread thr8(process, std::move(p));
+    thr8.join();
 
     return 0;
 }
