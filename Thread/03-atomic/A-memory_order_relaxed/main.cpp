@@ -22,7 +22,7 @@ read_values values5[loop_count];
 
 void increment(std::atomic<int>* var_to_inc, read_values* values)
 {
-    while(!go.load(std::memory_order_relaxed)) {
+    while(!go) {
         std::this_thread::yield();
     }
 
@@ -37,7 +37,7 @@ void increment(std::atomic<int>* var_to_inc, read_values* values)
 
 void read_vals(read_values* values)
 {
-    while (!go.load(std::memory_order_relaxed)) {
+    while (!go) {
         std::this_thread::yield();
     }
     for (unsigned i = 0; i < loop_count; i++) {
@@ -59,6 +59,7 @@ void print(read_values* v)
     std::cout << endl;
 }
 
+
 int main()
 {
     std::thread t1(increment, &x, values1);
@@ -67,7 +68,7 @@ int main()
     std::thread t4(read_vals, values4);
     std::thread t5(read_vals, values5);
 
-    go.store(true, std::memory_order_relaxed);
+    go.store(true);
 
     t1.join();
     t2.join();
