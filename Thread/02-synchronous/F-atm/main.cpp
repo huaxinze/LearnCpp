@@ -69,6 +69,7 @@ class close_queue
 {
 };
 
+// 分发模板类
 template<typename PreviousDispatcher, typename Msg, typename Func>
 class TemplateDispatcher
 {
@@ -97,6 +98,7 @@ private:
 
     bool dispatch(std::shared_ptr<message_base> const& msg)
     {
+        // 检查是不是自己可以处理的消息
         if (wrapped_message<Msg>* wrapper = dynamic_cast<wrapped_message<Msg>*>(msg.get()))
         {
             f(wrapper->contents);
@@ -136,6 +138,7 @@ public:
     }
 };
 
+// 分发类
 class dispatcher 
 {
 private:
@@ -187,7 +190,7 @@ public:
     {
         if (!chained)
         {
-            
+            wait_and_dispatch();
         }
     }
 };
@@ -204,6 +207,171 @@ public:
     dispatcher wait()
     {
         return dispatcher(&q);
+    }
+};
+
+// 柜员机消息
+struct withdraw
+{
+    std::string account;
+    unsigned amount;
+    mutable messaging::sender atm_queue;
+    withdraw(std::string const &account_, unsigned amount_, messaging::sender atm_queue_)
+        : account(account_),
+          amount(amount_),
+          atm_queue(atm_queue_)
+    {}
+};
+
+struct withdraw_ok
+{};
+
+struct withdraw_denied
+{};
+
+struct cancel_withdrwal
+{
+    std::string account;
+    unsigned amount;
+    cancel_withdrwal(std::string const& account_, unsigned amount_)
+        : account(account_), amount(amount_)
+    {}
+};
+
+struct withdrawal_processed
+{
+    std::string account;
+    unsigned amount;
+    withdrawal_processed(std::string const& account_, unsigned amount_)
+        : account(account_), amount(amount_)
+    {}
+};
+
+struct card_inserted
+{
+    std::string account;
+    explicit card_inserted(std::string const& account_)
+        : account(account_)
+    {}
+};
+
+struct digit_pressed
+{
+    char digit;
+    explicit digit_pressed(char digit_)
+        : digit(digit_)
+    {}
+};
+
+struct clear_last_pressed
+{};
+
+struct eject_card
+{};
+
+struct withdraw_pressed
+{
+    unsigned amount;
+    explicit withdraw_pressed(unsigned amount_)
+        : amount(amount_)
+    {}
+};
+
+struct cancel_pressed
+{};
+
+struct issue_money
+{
+    unsigned amount;
+    issue_money(unsigned amount_)
+        : amount(amount_)
+    {}
+};
+
+struct verify_pin
+{
+    std::string account;
+    std::string pin;
+    mutable messaging::sender atm_queue;
+    verify_pin(std::string const& account_, std::string const& pin_, messaging::sender atm_queue_)
+        : account(account_), pin(pin_), atm_queue(atm_queue_)
+    {}
+};
+
+struct pin_verified
+{};
+
+struct pin_incorrect
+{};
+
+struct display_enter_pin
+{};
+
+struct display_enter_card
+{};
+
+struct display_insufficient_funds
+{};
+
+struct display_withdrawal_cancelled
+{};
+
+struct display_pin_incorrect_message
+{};
+
+struct display_withdrawal_options
+{};
+
+struct get_balance
+{
+    std::string account;
+    mutable messaging::sender atm_queue;
+    get_balance(std::string const& account_, messaging::sender atm_queue_)
+        : account(account_), atm_queue(atm_queue_)
+    {}
+};
+
+struct balance
+{
+    unsigned amount;
+    explicit balance(unsigned amount_)
+        : amount(amount_)
+    {}
+};
+
+struct display_balance
+{
+    unsigned amount;
+    explicit display_balance(unsigned amount_)
+        : amount(amount_)
+    {}
+};
+
+struct balance_pressed
+{};
+
+class atm
+{
+    messaging::receiver incoming;
+    messaging::sender bank;
+    messaging::sender interface_hardware;
+    void (atm::*state)();
+    std::string account;
+    unsigned withdrawal_amount;
+    std::string pin;
+    void process_withdrwal()
+    {
+        incoming.wait().handle<withdraw_ok>(
+            [&](withdraw_ok const& msg)
+            {
+                // todo
+            }
+        ).handle<withdraw_denied>(
+            [&](withdraw_denied const& msg)
+            {
+                // todo
+            }
+        ).handle<withdraw_pressed>
     }
 };
 
