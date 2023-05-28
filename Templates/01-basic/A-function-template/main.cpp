@@ -1,4 +1,5 @@
 #include <iostream>
+#include <concepts>
 using namespace std;
 
 template<typename T>
@@ -39,6 +40,27 @@ void f(T arg = "")
     std::cout << arg << std::endl;
 }
 
+// 要求整形且可自加
+template<typename T>
+concept Incrementable = requires(T x) { x++; ++x; } && std::integral<T> && sizeof(T) == 4;
+
+void process(const Incrementable auto& t)
+{
+    std::cout << "int 1: " << t << std::endl;
+}
+
+template<typename T> requires (sizeof(T) == 2)
+void process(const T& t)
+{
+    std::cout << "int 2: " << t << std::endl;
+}
+
+// 函数模板的简易用法
+void function(const auto& t) 
+{
+    std::cout << "enter function " << t << std::endl;
+}
+
 int main()
 {
     std::cout << "enter function template" << std::endl;
@@ -57,6 +79,14 @@ int main()
     std::cout << typeid(num2).name() << std::endl;
 
     f(100);
+
+    process(100);
+
+    process(short(100));
+
+    function(2.0);
+
+    function("hello world");
 
     return 0;
 }
