@@ -1,0 +1,8 @@
+#测试动态库加载
+
+[linux平台]
+1.在根目录下执行sudo ./build.sh make
+2.在/usr/bin目录下执行可执行文件./ifly_test 0/1/2 [0表示使用默认的/usr/lib下的so库, 1表示使用的/speech/ifly1目录下的库, 2表示使用的是/speech/ifly2目录下的库]
+3.使用不同的库打印的日志不同
+
+[qnx平台]
